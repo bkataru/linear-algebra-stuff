@@ -14,6 +14,7 @@ A = [[7, 3], [2, 5], [6, 8], [9, 0]]
 B = [[7, 4, 9], [8, 1, 5]]
 C = [[1, 7], [2, 4]]
 D = [[7, 4, 9], [8, 1, 5], [8, 3, 8]]
+E = [[5, 2, 6, 1], [0, 6, 2, 0], [3, 8, 1, 4], [1, 8, 5, 6]]
 
 # Matrix addition
 def add(A, B):
@@ -78,12 +79,14 @@ def findNext(item, ind, iter):
     except IndexError:
         return (ind + iter) - len(item)
 
-
+# only valid for 2x2 and 3x3
 def determinant(A):
     if len(A) == 2:
         diagonals = 1
     else:
         diagonals = len(A)
+
+    print(A)
 
     forwardDiagonals = []
     for i in range(diagonals):
@@ -92,15 +95,21 @@ def determinant(A):
             diagonal *= A[k][findNext(A, k, i)]
         forwardDiagonals.append(diagonal)
 
+    print(forwardDiagonals)
+
     for ind in range(len(A)):
         A[ind] = A[ind][::-1]
+
+    print(A)
 
     backwardDiagonals = []
     for j in range(diagonals):
         diagonal = 1
-        for k in range(len(A)):
-            diagonal *= A[k][findNext(A, k, j)]
+        for l in range(len(A)):
+            diagonal *= A[l][findNext(A, l, j)]
         backwardDiagonals.append(diagonal)
+
+    print(backwardDiagonals)
 
     return sum(forwardDiagonals) - sum(backwardDiagonals)
 
@@ -111,7 +120,7 @@ def prettyPrint(X):
             print(k, end='\t')
         print()
 
-print(determinant(D))
+print(determinant(E))
 
 # prettyPrint(multiply(A, B))
 
