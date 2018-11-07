@@ -1,13 +1,19 @@
-
+'''
 A = [[9, 2, 4], [3, 5, 6]]
 B = [[2, 4, 1], [2, 5, 7]]
-'''
+
 C = [[1, 7], [2, 4]]
 D = [[3, 3], [5, 2]]
-'''
+
 
 C = [[4, 7, 1], [8, 3, 8]]
 D = [[4, 2], [5, 9], [6, 3]]
+'''
+
+A = [[7, 3], [2, 5], [6, 8], [9, 0]]
+B = [[7, 4, 9], [8, 1, 5]]
+C = [[1, 7], [2, 4]]
+D = [[7, 4, 9], [8, 1, 5], [8, 3, 8]]
 
 # Matrix addition
 def add(A, B):
@@ -39,7 +45,7 @@ def scalarMultiply(A, s):
         X.append(new_row)
     return X
 
-
+# Dot product of column vectors
 def dotProduct(a, b):
     dotP = 0
     for i in range(len(a)):
@@ -65,13 +71,49 @@ def multiply(A, B):
     else:
         return -1
 
+def findNext(item, ind, iter):
+    try:
+        elem = item[ind + iter]
+        return ind + iter
+    except IndexError:
+        return (ind + iter) - len(item)
+
+
+def determinant(A):
+    if len(A) == 2:
+        diagonals = 1
+    else:
+        diagonals = len(A)
+
+    forwardDiagonals = []
+    for i in range(diagonals):
+        diagonal = 1
+        for k in range(len(A)):
+            diagonal *= A[k][findNext(A, k, i)]
+        forwardDiagonals.append(diagonal)
+
+    for ind in range(len(A)):
+        A[ind] = A[ind][::-1]
+
+    backwardDiagonals = []
+    for j in range(diagonals):
+        diagonal = 1
+        for k in range(len(A)):
+            diagonal *= A[k][findNext(A, k, j)]
+        backwardDiagonals.append(diagonal)
+
+    return sum(forwardDiagonals) - sum(backwardDiagonals)
+
+
 def prettyPrint(X):
     for elem in X:
         for k in elem:
             print(k, end='\t')
         print()
 
-prettyPrint(multiply(C, D))
+print(determinant(D))
+
+# prettyPrint(multiply(A, B))
 
 
 
