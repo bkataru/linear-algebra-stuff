@@ -111,7 +111,7 @@ def lowerDeterminant(A):
 
     return sum(forwardDiagonals) - sum(backwardDiagonals)
 
-# valid for all nxn matrices
+# valid for all NxN matrices
 def higherDeterminant(X):
     l = len(X)
 
