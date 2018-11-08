@@ -86,8 +86,6 @@ def determinant(A):
     else:
         diagonals = len(A)
 
-    print(A)
-
     forwardDiagonals = []
     for i in range(diagonals):
         diagonal = 1
@@ -95,12 +93,8 @@ def determinant(A):
             diagonal *= A[k][findNext(A, k, i)]
         forwardDiagonals.append(diagonal)
 
-    print(forwardDiagonals)
-
     for ind in range(len(A)):
         A[ind] = A[ind][::-1]
-
-    print(A)
 
     backwardDiagonals = []
     for j in range(diagonals):
@@ -108,8 +102,6 @@ def determinant(A):
         for l in range(len(A)):
             diagonal *= A[l][findNext(A, l, j)]
         backwardDiagonals.append(diagonal)
-
-    print(backwardDiagonals)
 
     return sum(forwardDiagonals) - sum(backwardDiagonals)
 
@@ -120,7 +112,7 @@ def prettyPrint(X):
             print(k, end='\t')
         print()
 
-print(determinant(E))
+print(determinant(D))
 
 # prettyPrint(multiply(A, B))
 
