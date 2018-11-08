@@ -16,10 +16,10 @@
 #       4. multiply([matrixA], [matrixB]) -- multiplying two matrices (if their product is defined, else returns -1)
 #       5. dotProduct([matrixA], [matrixB]) -- dot product of two column vectors (used in matrix multiplication)
 #       5. determinant([matrixA]) -- find the determinant of an NxN matrix (general function for NxN, works only if the matrix is a square matrix or else returns -1)
-#       6. higherDeterminant([matrixA]) -- find the determinant of matrices using submatrix/minor method (used for 4x4 matrices and above but can be used for lower order matrices as well, partially recursive and computationally heavier than the diagonal method for lower order matrices)
+#       6. higherDeterminant([matrixX]) -- find the determinant of matrices using submatrix/minor method (used for 4x4 matrices and above but can be used for lower order matrices as well, partially recursive and computationally heavier than the diagonal method for lower order matrices)
 #       7. lowerDeterminant([matrixA]) -- find the determinant of matrices using diagonal method (can only be used for 2x2 and 3x3, computationally faster for 2x3 and 3x3 as compared to the minor method)
-#       8. prettyPrint([matrixA]) -- pretty print a matrix.
-#       9. findNext([matrixA], index, iteration) -- random function, used to create a cycling indexing function where out of bounds indices are made valid indices (used in diagonal method for determinant calculation)
+#       8. prettyPrint([matrixX]) -- pretty print a matrix.
+#       9. findNext(item, index, iteration) -- random function, used to create a cycling indexing function where out of bounds indices are made valid indices (used in diagonal method for determinant calculation)
 #
 
 # Sample matrices below (for testing purposes)

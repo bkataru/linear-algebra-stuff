@@ -17,7 +17,7 @@
 *   4. linearAlgebra.multiply([matrixA], [matrixB]) -- multiplying two matrices (if their product is defined, else returns -1)
 *   5. linearAlgebra.dotProduct([matrixA], [matrixB]) -- dot product of two column vectors (used in matrix multiplication)
 *   6. linearAlgebra.determinant([matrixA]) -- find the determinant of an NxN matrix (if the matrix is a square matrix, else returns -1)
-*   7. linearAlgebra.prettyPrint([matrixA]) -- pretty print a matrix.
+*   7. linearAlgebra.prettyPrint([matrixX]) -- pretty print a matrix.
 * */
 
 // Sample matrices below (for testing purposes)
