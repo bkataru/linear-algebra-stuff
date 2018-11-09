@@ -4,8 +4,12 @@
 *       add -- add two matrices,
 *       subtract -- subtract two matrices,
 *       scalar multiply -- multiply a matrix by a scalar,
+*       dotProduct([matrixA], [matrixB]) -- dot product of two column vectors (used in matrix multiplication)
 *       multiply -- multiply two matrices together (if their product is defined),
+*       transpose -- transpose (spatially invert by rows and cols) a matrix of any dimensions
 *       determinant -- find the determinant of an NxN square matrix,
+*       inverse -- find the inverse of an NxN square matrix (the inverse of a matrix when multiplied with the original matrix produced the identity matrix of the corresponding order),
+*       dotProduct -- find the dot product of two column vectors,
 *       pretty print -- print matrices like matrices and not like ugly 2D arrayx :)
 *  ]
 * Required packages: None.
@@ -14,10 +18,12 @@
 *   1. linearAlgebra.add([matrixA], [matrixB]) -- adding matrices
 *   2. linearAlgebra.subtract([matrixA], [matrixB]) -- subtracting two matrices
 *   3. linearAlgebra.scalarMultiply([matrixA], scalar) -- multiplying a matrix by a scalar
-*   4. linearAlgebra.multiply([matrixA], [matrixB]) -- multiplying two matrices (if their product is defined, else returns -1)
-*   5. linearAlgebra.dotProduct([matrixA], [matrixB]) -- dot product of two column vectors (used in matrix multiplication)
-*   6. linearAlgebra.determinant([matrixA]) -- find the determinant of an NxN matrix (if the matrix is a square matrix, else returns -1)
-*   7. linearAlgebra.prettyPrint([matrixX]) -- pretty print a matrix.
+*   4. linearAlgebra.dotProduct([matrixA], [matrixB]) -- dot product of two column vectors (used in matrix multiplication)
+*   5. linearAlgebra.multiply([matrixA], [matrixB]) -- multiplying two matrices (if their product is defined, else returns -1)
+*   6. transpose([matrixA]) -- transpose (spatially invert by rows and cols) a matrix of any dimensions
+*   7. linearAlgebra.determinant([matrixA]) -- find the determinant of an NxN matrix (general function for NxN, works only if the matrix is a square matrix or else returns -1)
+*   8. linearAlgebra.inverse([matrixA]) -- find the inverse of a matrix (if the matrix is a square matrix and its inverse is defined, else returns -1)
+*   9. linearAlgebra.prettyPrint([matrixX]) -- pretty print a matrix.
 * */
 
 // Sample matrices below (for testing purposes)
@@ -36,6 +42,7 @@ S = [[3, 3], [5, 2]];
 U = [[4, 2], [5, 9], [6, 3]];
 // 3x3
 D = [[7, 4, 9], [8, 1, 5], [8, 3, 8]];
+O = [[-1, -2, 2], [2, 1, 1], [3, 4, 5]];
 // 4x4
 E = [[5, 2, 6, 1], [0, 6, 2, 0], [3, 8, 1, 4], [1, 8, 5, 6]];
 // 5x5
@@ -177,8 +184,8 @@ var linearAlgebra = (function () {
         return forwardDiagonals.reduce((a, b) => a + b, 0) - backwardDiagonals.reduce((a, b) => a + b, 0);
     }
 
-    function higherDeterminant(X) {
-        let l = X.length;
+    function higherDeterminant(A) {
+        let l = A.length;
 
         let calcArr = [];
         for(let i = 0; i < l; i++)
@@ -193,7 +200,7 @@ var linearAlgebra = (function () {
                         break;
                     if(k === i)
                         continue;
-                    row.push(X[j][k]);
+                    row.push(A[j][k]);
                 }
 
                 if(row.length > 0)
@@ -202,7 +209,7 @@ var linearAlgebra = (function () {
 
             }
             let func = rows.length > 3 ? higherDeterminant : lowerDeterminant;
-            calcArr.push(X[0][i] * func(rows));
+            calcArr.push(A[0][i] * func(rows));
         }
 
         let determinantVal = 0;
@@ -225,17 +232,135 @@ var linearAlgebra = (function () {
         if(A.length !== A[0].length)
             return -1;
 
-        return higherDeterminant(A);
+        if(A.length === 2)
+            return lowerDeterminant(A);
+        else
+            return higherDeterminant(A);
     }
 
-    function prettyPrint(X) {
-        for(let elem of X)
+    function transpose(A) {
+        let transposed = [];
+        for(let i = 0; i < A[0].length; i++)
         {
-            for(let k of elem)
+            let row = [];
+            for(let k = 0; k < A.length; k++)
             {
-                process.stdout.write(k + '\t');
+                row.push(A[k][i])
             }
-            process.stdout.write('\n');
+            transposed.push(row);
+        }
+
+        return transposed;
+    }
+
+    function inverse(A) {
+        if(A.length !== A[0].length)
+            return -1;
+
+        let det = determinant(A);
+        if(det === 0)
+            return -1;
+        else
+        {
+            let l = A.length;
+            if(l === 2)
+            {
+                let temp = transpose(A);
+
+                let adjugate = [];
+                for(let p = temp.length - 1; p >= 0; p--)
+                {
+                    adjugate.push(temp[p]);
+                }
+                for(let i = 0; i < l; i++)
+                {
+                    for(let k = 0; k < l; k++)
+                    {
+                        if(k === i)
+                            adjugate[i][k] = -adjugate[i][k]
+                    }
+                }
+
+                let finalAdj = [];
+                for(let r = 0; r < l; r++)
+                {
+                    let row = [];
+                    for(let s = l - 1; s >= 0; s--)
+                    {
+                        row.push(adjugate[r][s]);
+                    }
+                    finalAdj.push(row);
+                }
+
+                return scalarMultiply(finalAdj, 1/det);
+            }
+            else
+            {
+                let matrix_of_minors = [];
+                for(let u = 0; u < l; u++)
+                {
+                    let calcArr = [];
+                    for(let i = 0; i < l; i++)
+                    {
+                        let rows = [];
+                        for(let j = 0; j < l; j++)
+                        {
+                            let row = [];
+                            for(let k = 0; k < l; k++)
+                            {
+                                if(j === u)
+                                    break;
+                                if(k === i)
+                                    continue;
+                                row.push(A[j][k])
+                            }
+                            if(row.length > 0)
+                                rows.push(row);
+                        }
+                        let func;
+                        if(rows.length > 3)
+                            func = higherDeterminant;
+                        else
+                            func = lowerDeterminant;
+                        calcArr.push(func(rows));
+                    }
+                    matrix_of_minors.push(calcArr);
+                }
+
+                for(let i = 0; i < l; i++)
+                {
+                    let start;
+                    if(i % 2 === 0)
+                        start = +1;
+                    else
+                        start = -1;
+                    for(let j = 0; j < l; j++)
+                    {
+                        matrix_of_minors[i][j] = start * matrix_of_minors[i][j];
+                        start *= -1;
+                    }
+                }
+
+                return scalarMultiply(transpose(matrix_of_minors), 1/det);
+            }
+        }
+    }
+
+    function prettyPrint(A) {
+        if(A.constructor !== Array)
+        {
+            process.stdout.write("Not a list");
+        }
+        else
+        {
+            for(let elem of A)
+            {
+                for(let k of elem)
+                {
+                    process.stdout.write(k + '\t');
+                }
+                process.stdout.write('\n');
+            }
         }
     }
 
@@ -243,7 +368,10 @@ var linearAlgebra = (function () {
         add: add,
         subtract: subtract,
         scalarMultiply: scalarMultiply,
+        dotProduct: dotProduct,
         multiply: multiply,
+        transpose: transpose,
+        inverse: inverse,
         findNext: findNext,
         determinant: determinant,
         prettyPrint: prettyPrint
@@ -253,7 +381,8 @@ var linearAlgebra = (function () {
 // how to use:
 // console.log(linearAlgebra.determinant(H));
 // linearAlgebra.prettyPrint(multiply(B, U));
-// linearAlgebra.prettyPrint(H);
+// linearAlgebra.prettyPrint(linearAlgebra.transpose(A));
+// linearAlgebra.prettyPrint(linearAlgebra.inverse(G));
 
 module.exports = linearAlgebra;
 

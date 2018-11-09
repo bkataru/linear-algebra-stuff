@@ -4,8 +4,10 @@
 #       subtract -- subtract two matrices,
 #       scalar multiply -- multiply a matrix by a scalar,
 #       multiply -- multiply two matrices together (if their product is defined),
+#       transpose -- transpose (spatially invert by rows and cols) a matrix of any dimensions,
 #       determinant -- find the determinant of an NxN square matrix (general function),
-#       dotProduct -- find the dot product of two column vectors
+#       inverse -- find the inverse of an NxN square matrix (the inverse of a matrix when multiplied with the original matrix produced the identity matrix of the corresponding order),
+#       dotProduct -- find the dot product of two column vectors,
 #       pretty print -- print matrices like matrices and not like ugly 2D arrayx :)
 #  ]
 # Required packages: None.
@@ -13,14 +15,15 @@
 #       1. add([matrixA], [matrixB]) -- adding matrices
 #       2. subtract([matrixA], [matrixB]) -- subtracting two matrices
 #       3. scalarMultiply([matrixA], scalar) -- multiplying a matrix by a scalar
-#       4. multiply([matrixA], [matrixB]) -- multiplying two matrices (if their product is defined, else returns -1)
-#       5. dotProduct([matrixA], [matrixB]) -- dot product of two column vectors (used in matrix multiplication)
-#       5. determinant([matrixA]) -- find the determinant of an NxN matrix (general function for NxN, works only if the matrix is a square matrix or else returns -1)
-#       6. higherDeterminant([matrixX]) -- find the determinant of matrices using submatrix/minor method (used for 4x4 matrices and above but can be used for lower order matrices as well, partially recursive and computationally heavier than the diagonal method for lower order matrices)
-#       7. lowerDeterminant([matrixA]) -- find the determinant of matrices using diagonal method (can only be used for 2x2 and 3x3, computationally faster for 2x3 and 3x3 as compared to the minor method)
-#       8. prettyPrint([matrixX]) -- pretty print a matrix.
-#       9. findNext(item, index, iteration) -- random function, used to create a cycling indexing function where out of bounds indices are made valid indices (used in diagonal method for determinant calculation)
-#
+#       4. dotProduct([matrixA], [matrixB]) -- dot product of two column vectors (used in matrix multiplication)
+#       5. multiply([matrixA], [matrixB]) -- multiplying two matrices (if their product is defined, else returns -1)
+#       6. transpose([matrixA]) -- transpose (spatially invert by rows and cols) a matrix of any dimensions
+#       7. determinant([matrixA]) -- find the determinant of an NxN matrix (general function for NxN, works only if the matrix is a square matrix or else returns -1)
+#       8. higherDeterminant([matrixA]) -- find the determinant of matrices using submatrix/minor method (works only for 3x3 matrices and above, partially recursive and computationally heavier than the diagonal method)
+#       9. lowerDeterminant([matrixA]) -- find the determinant of matrices using diagonal method (can only be used for 2x2 and 3x3, computationally faster for 3x3 as compared to the minor method)
+#       10. inverse([matrixA]) -- find the inverse of a matrix (if the matrix is a square matrix and its inverse is defined, else returns -1)
+#       11. prettyPrint([matrixX]) -- pretty print a matrix.
+#       12. findNext(item, index, iteration) -- random function, used to create a cycling indexing function where out of bounds indices are made valid indices (used in diagonal method for determinant calculation)
 
 # Sample matrices below (for testing purposes)
 # 4x2
@@ -38,6 +41,7 @@ S = [[3, 3], [5, 2]]
 U = [[4, 2], [5, 9], [6, 3]]
 # 3x3
 D = [[7, 4, 9], [8, 1, 5], [8, 3, 8]]
+O = [[-1, -2, 2], [2, 1, 1], [3, 4, 5]]
 # 4x4
 E = [[5, 2, 6, 1], [0, 6, 2, 0], [3, 8, 1, 4], [1, 8, 5, 6]]
 # 5x5
@@ -125,21 +129,22 @@ def lowerDeterminant(A):
             diagonal *= A[k][findNext(A, k, i)]
         forwardDiagonals.append(diagonal)
 
-    for ind in range(len(A)):
-        A[ind] = A[ind][::-1]
+    invertedA = []
+    for elem in A:
+        invertedA.append(elem[::-1])
 
     backwardDiagonals = []
     for j in range(diagonals):
         diagonal = 1
-        for l in range(len(A)):
-            diagonal *= A[l][findNext(A, l, j)]
+        for l in range(len(invertedA)):
+            diagonal *= invertedA[l][findNext(A, l, j)]
         backwardDiagonals.append(diagonal)
 
     return sum(forwardDiagonals) - sum(backwardDiagonals)
 
-# Valid for all NxN matrices
-def higherDeterminant(X):
-    l = len(X)
+# Valid for 3x3 and above
+def higherDeterminant(A):
+    l = len(A)
 
     calcArr = []
     for i in range(l):
@@ -151,7 +156,7 @@ def higherDeterminant(X):
                     break
                 if k == i:
                     continue
-                row.append(X[j][k])
+                row.append(A[j][k])
             if row:
                 rows.append(row)
 
@@ -159,7 +164,7 @@ def higherDeterminant(X):
             func = higherDeterminant
         else:
             func = lowerDeterminant
-        calcArr.append(X[0][i] * func(rows))
+        calcArr.append(A[0][i] * func(rows))
 
     determinant = 0
     for i in range(len(calcArr)):
@@ -175,14 +180,89 @@ def determinant(A):
     if len(A) != len(A[0]):
         return -1
 
-    return higherDeterminant(A)
+    if len(A) == 2:
+        return lowerDeterminant(A)
+    else:
+        return higherDeterminant(A)
+
+def transpose(A):
+    transposed = []
+    for i in range(len(A[0])):
+        row = []
+        for k in range(len(A)):
+            row.append(A[k][i])
+        transposed.append(row)
+
+    return transposed
+
+def inverse(A):
+    if len(A) != len(A[0]):
+        return -1
+
+    det = determinant(A)
+    if det == 0:
+        return -1
+    else:
+        l = len(A)
+        if l == 2:
+            adjugate = transpose(A)
+
+            adjugate = adjugate[::-1]
+            for i in range(l):
+                for k in range(l):
+                    if k == i:
+                        adjugate[i][k] = -adjugate[i][k]
+
+            for temp in range(l):
+                adjugate[temp] = adjugate[temp][::-1]
+
+            return scalarMultiply(adjugate, 1/det)
+        else:
+            matrix_of_minors = []
+            for u in range(l):
+                calcArr = []
+                for i in range(l):
+                    rows = []
+                    for j in range(l):
+                        row = []
+                        for k in range(l):
+                            if j == u:
+                                break
+                            if k == i:
+                                continue
+                            row.append(A[j][k])
+                        if row:
+                            rows.append(row)
+
+                    if len(rows) > 3:
+                        func = higherDeterminant
+                    else:
+                        func = lowerDeterminant
+                    calcArr.append(func(rows))
+                matrix_of_minors.append(calcArr)
+
+            for i in range(l):
+                if i % 2 == 0:
+                    start = +1
+                else:
+                    start = -1
+                for j in range(l):
+                    matrix_of_minors[i][j] = start * matrix_of_minors[i][j]
+                    start *= -1
+
+            return scalarMultiply(transpose(matrix_of_minors), 1/det)
+
+
 
 # Print matrices like matrices
-def prettyPrint(X):
-    for elem in X:
-        for k in elem:
-            print(k, end='\t')
-        print()
+def prettyPrint(A):
+    if type(A) == list:
+        for elem in A:
+            for k in elem:
+                print(k, end='\t')
+            print()
+    else:
+        print("Not a list")
 
 
 # how to use:
@@ -190,6 +270,9 @@ def prettyPrint(X):
 # prettyPrint(multiply(A, B))
 # print(determinant(H))
 # prettyPrint(G)
+
+prettyPrint(multiply(G, inverse(G)))
+
 
 
 
