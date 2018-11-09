@@ -185,6 +185,7 @@ def determinant(A):
     else:
         return higherDeterminant(A)
 
+# Valid for matrices of any dimensions
 def transpose(A):
     transposed = []
     for i in range(len(A[0])):
@@ -195,6 +196,7 @@ def transpose(A):
 
     return transposed
 
+# Valid for any NxN square matrices
 def inverse(A):
     if len(A) != len(A[0]):
         return -1
@@ -270,8 +272,7 @@ def prettyPrint(A):
 # prettyPrint(multiply(A, B))
 # print(determinant(H))
 # prettyPrint(G)
-
-prettyPrint(multiply(G, inverse(G)))
+# prettyPrint(multiply(G, inverse(G)))
 
 
 
